@@ -16,7 +16,7 @@
   }
 
   function updateEntries() {
-    entries.photoMemory = { media, memoryText };
+    entries.photo = { media, memoryText };
   }
 </script>
 

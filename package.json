@@ -3,18 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-
   "scripts": {
-  "dev": "vite dev",
-  "build": "vite build",
-  "preview": "vite preview",
-  "deploy": "npm run build && gh-pages -d build"
-},
-
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "devDependencies": {
-    "@sveltejs/adapter-static": "^3.0.9",
     "@sveltejs/vite-plugin-svelte": "^6.1.1",
-    "gh-pages": "^6.3.0",
     "svelte": "^5.38.1",
     "vite": "^7.1.2"
   },

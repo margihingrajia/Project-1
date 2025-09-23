@@ -1,15 +1,19 @@
 <script>
   import { createEventDispatcher, onMount } from "svelte";
-  export let activePage = "today"; // today | calendar | day | settings
-  export let userName = "Parent"; // default user name
+  export let activePage = "today"; // today | calendar | trends | settings
+  export let userName = "Demo User";
+  export let startDate = new Date("2025-01-01");
+  export let activeDays = 15;
+
   const dispatch = createEventDispatcher();
 
-  // Current datetime
   let currentTime = new Date().toLocaleString();
-  let timer;
+  $: daysSinceStart = Math.floor(
+    (new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24)
+  );
 
   onMount(() => {
-    timer = setInterval(() => {
+    const timer = setInterval(() => {
       currentTime = new Date().toLocaleString();
     }, 1000);
   });
@@ -24,101 +28,91 @@
 </script>
 
 <header class="header">
-  <!-- Left: App Title + User Name -->
+  <!-- Left: Logo + App Info -->
   <div class="header-left">
-    <h1>Little Moments</h1>
-    <span class="user-name">Hi, {userName}!</span>
-    <span class="tagline">Capture Every Memory</span>
+    <img src="/images/logo.png" alt="Little Moments Logo" class="logo" />
+    <div class="app-info">
+      <h1>Little Moments</h1>
+      <span class="user-name">Hi, {userName}!</span>
+      <span class="tagline">{daysSinceStart} days since beginning | {activeDays} active days</span>
+    </div>
   </div>
 
-  <!-- Center: Navigation -->
-  <nav class="header-nav">
-    <button class:selected={activePage === "today"} on:click={() => navigate("today")}>Today</button>
-    <button class:selected={activePage === "calendar"} on:click={() => navigate("calendar")}>Previous Entries</button>
-  </nav>
-
-  <!-- Right: Datetime + Settings Icon -->
+  <!-- Right: Navigation buttons + Datetime -->
   <div class="header-right">
     <span class="datetime">{currentTime}</span>
-    <button class="settings-icon" on:click={toggleSettings} title="Settings">
-      ⚙️
-    </button>
+    <div class="nav-buttons">
+      <button on:click={() => navigate("today")} class:selected={activePage==="today"}>
+        <img src="/images/today.png" alt="Today" class="btn-icon" /> New Entry
+      </button>
+      <button on:click={() => navigate("calendar")} class:selected={activePage==="calendar"}>
+        <img src="/images/calendar.png" alt="Previous Entries" class="btn-icon" /> Previous
+      </button>
+      <button on:click={() => navigate("trends")} class:selected={activePage==="trends"}>
+        <img src="/images/trend.png" alt="Trends" class="btn-icon" /> Trends
+      </button>
+      <button on:click={toggleSettings} class:selected={activePage==="settings"}>
+        <img src="/images/settings.png" alt="Settings" class="btn-icon" /> Settings
+      </button>
+    </div>
   </div>
 </header>
 
 <style>
-/* ================= Header ================= */
 .header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background: #f3f4f1;
+  align-items: center;
   padding: 0.75rem 1.5rem;
+  background: #f3f4f1;
   border-bottom: 2px solid #d6e0d9;
   position: sticky;
   top: 0;
   z-index: 100;
   flex-wrap: wrap;
+  gap: 1rem;
 }
 
-/* Left section: App title + user */
-.header-left h1 {
-  font-size: 1.4rem;
+/* Left: Logo + App Info */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.app-info h1 {
   margin: 0;
+  font-size: 1.5rem;
   color: #34403c;
 }
 
-.header-left .user-name {
+.app-info .user-name {
   display: block;
   font-size: 0.9rem;
   color: #34403c;
   font-weight: 500;
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
 }
 
-.header-left .tagline {
+.app-info .tagline {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #66736b;
   margin-top: 0.1rem;
 }
 
-/* Center navigation */
-.header-nav {
-  display: flex;
-  gap: 1rem;
-  margin: 0.5rem 0;
-  flex-wrap: wrap;
-}
-
-.header-nav button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  background: #dbe6d4;
-  cursor: pointer;
-  color: #34403c;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.header-nav button:hover {
-  background: #c8ddb8;
-  color: #000;
-}
-
-.header-nav button.selected {
-  background: #a3b18a;
-  font-weight: bold;
-}
-
-/* Right section: datetime + settings gear */
+/* Right: datetime + nav buttons */
 .header-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  font-size: 0.85rem;
-  color: #34403c;
 }
 
 .header-right .datetime {
@@ -127,49 +121,87 @@
   margin-bottom: 0.3rem;
 }
 
-.settings-icon {
-  font-size: 1.2rem;
-  background: none;
+/* Navigation buttons group */
+.nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nav-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
   border: none;
+  background: #dbe6d4;         /* base color */
   cursor: pointer;
-  transition: transform 0.2s;
+  font-weight: 500;
+  transition: all 0.2s;
   color: #34403c;
 }
 
-.settings-icon:hover {
-  transform: rotate(20deg);
+.nav-buttons button:hover {
+  background: #c8ddb8;
 }
 
-/* ================= Dark Mode Overrides ================= */
-:global(.dark-mode) .header {
-  background: #1f2920 !important;
-  border-bottom: 2px solid #2f3d34 !important;
-}
-
-:global(.dark-mode) .header-left h1,
-:global(.dark-mode) .header-left .user-name,
-:global(.dark-mode) .header-left .tagline,
-:global(.dark-mode) .header-right,
-:global(.dark-mode) .header-right .datetime {
-  color: #e0f2e9 !important;
-}
-
-:global(.dark-mode) .header-nav button {
-  background: #2b3a2f !important;
-  color: #e0f2e9 !important;
-}
-
-:global(.dark-mode) .header-nav button:hover {
-  background: #3b4c41 !important;
+.nav-buttons button.selected {
+  background: #a3b18a !important; /* important ensures override */
   color: #fff !important;
+  font-weight: bold;
 }
 
-:global(.dark-mode) .header-nav button.selected {
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Dark mode */
+:global(.dark-mode) .header {
+  background: #1f2920;
+  border-bottom: 2px solid #2f3d34;
+}
+
+:global(.dark-mode) .app-info h1,
+:global(.dark-mode) .app-info .user-name,
+:global(.dark-mode) .app-info .tagline,
+:global(.dark-mode) .header-right .datetime {
+  color: #e0f2e9;
+}
+
+:global(.dark-mode) .nav-buttons button {
+  background: #2b3a2f;
+  color: #e0f2e9;
+}
+
+:global(.dark-mode) .nav-buttons button:hover {
+  background: #3b4c41;
+  color: #fff;
+}
+
+:global(.dark-mode) .nav-buttons button.selected {
   background: #556b2f !important;
   color: #fff !important;
 }
 
-:global(.dark-mode) .settings-icon {
-  color: #e0f2e9 !important;
+/* Responsive */
+@media(max-width: 600px){
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .header-right {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .nav-buttons {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
 }
 </style>
